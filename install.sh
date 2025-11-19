@@ -57,7 +57,7 @@ sudo chmod 770 /etc/forgejo
 # this can't be used for initial setup
 #sudo wget -O /etc/forgejo/app.ini https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/custom/conf/app.example.ini
 
-echo >/tmp/app.ini <<EOF
+cat > /tmp/app.ini <<EOF
 APP_NAME = Forgejo: Beyond coding. We Forge.
 RUN_USER = git
 WORK_PATH = /var/lib/forgejo
@@ -79,6 +79,7 @@ LEVEL = Info
 [service]
 EOF
 sudo mv /tmp/app.ini /etc/forgejo/app.ini
+cat /etc/forgejo/app.ini
 
 # Download and install systemd service
 echo "6. Installing systemd service..."
