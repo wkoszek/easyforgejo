@@ -1,9 +1,17 @@
 #!/bin/bash
 set -ex
 
-userdel forgejo && exit 0
-userdel git && exit 0
-sudo rm -rf /usr/local/bin/forgejo /usr/lib/forgejo /etc/forgejo /etc/systemd/system/forgejo.service /tmp/forgejo*
+sudo userdel forgejo || true
+sudo userdel git || true
+sudo groupdel git || true
+sudo rm -rf /etc/systemd/system/multi-user.target.wants/forgejo.service || true
+sudo service forgejo stop || true
+
+sudo rm -rf /usr/local/bin/forgejo
+sudo rm -rf /usr/lib/forgejo
+sudo rm -rf /var/lib/forgejo
+sudo rm -rf /etc/forgejo
+sudo rm -rf /etc/systemd/system/forgejo.service /tmp/forgejo*
 
 echo "========================================="
 echo "Forgejo Server & Runner Installation"
@@ -79,6 +87,8 @@ LEVEL = Info
 [service]
 EOF
 sudo mv /tmp/app.ini /etc/forgejo/app.ini
+sudo chmod 0777 /etc/forgejo/
+sudo chmod 0777 /etc/forgejo/app.ini
 sudo cat /etc/forgejo/app.ini
 
 # Download and install systemd service
@@ -90,7 +100,6 @@ echo "7. Enabling and starting Forgejo service..."
 sudo systemctl daemon-reload
 sudo systemctl enable forgejo.service
 sudo systemctl start forgejo.service
-
 
 export FORGEJO_WORK_DIR=/var/lib/forgejo
 export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
@@ -107,6 +116,9 @@ sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini \
 echo ""
 echo "Forgejo Server Status:"
 sudo systemctl status forgejo.service --no-pager
+
+echo "make admin"
+sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini admin user create --username forgejo-admin --admin --email admin@admin.com --password panacotaisthemessage --admin
 
 echo ""
 echo "========================================="
