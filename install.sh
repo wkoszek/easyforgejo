@@ -11,7 +11,8 @@ sudo rm -rf /usr/local/bin/forgejo
 sudo rm -rf /usr/lib/forgejo
 sudo rm -rf /var/lib/forgejo
 sudo rm -rf /etc/forgejo
-sudo rm -rf /etc/systemd/system/forgejo.service /tmp/forgejo*
+sudo rm -rf /etc/systemd/system/forgejo.service
+#sudo rm -rf /tmp/forgejo*
 
 echo "========================================="
 echo "Forgejo Server & Runner Installation"
@@ -27,7 +28,7 @@ echo "-------------------------------------------"
 
 # Update package list and install prerequisites
 echo "1. Installing prerequisites..."
-sudo apt update
+#sudo apt update
 sudo apt install -y git git-lfs
 
 # Create system user for Forgejo
@@ -41,10 +42,11 @@ FORGEJO_VERSION=$(curl -s https://codeberg.org/api/v1/repos/forgejo/forgejo/rele
 echo "   - Architecture: $ARCH"
 echo "   - Version: $FORGEJO_VERSION"
 cd /tmp
-wget -O forgejo.xz "https://codeberg.org/forgejo/forgejo/releases/download/${FORGEJO_VERSION}/forgejo-${FORGEJO_VERSION#v}-linux-${ARCH}.xz"
-unxz forgejo.xz
+if [ ! -e forgejo.xz ]; then
+	wget -c -O forgejo.xz "https://codeberg.org/forgejo/forgejo/releases/download/${FORGEJO_VERSION}/forgejo-${FORGEJO_VERSION#v}-linux-${ARCH}.xz"
+fi
+unxz -f --keep forgejo.xz
 chmod +x forgejo
-
 
 # Install Forgejo binary
 echo "4. Installing Forgejo binary..."
@@ -87,8 +89,8 @@ LEVEL = Info
 [service]
 EOF
 sudo mv /tmp/app.ini /etc/forgejo/app.ini
-sudo chmod 0777 /etc/forgejo/
-sudo chmod 0777 /etc/forgejo/app.ini
+#sudo chmod 0777 /etc/forgejo/
+#sudo chmod 0777 /etc/forgejo/app.ini
 sudo cat /etc/forgejo/app.ini
 
 # Download and install systemd service
@@ -108,10 +110,13 @@ echo "XXXX Secret: $RUNNER_SECRET"
 echo "proof user has access to app.ini"
 sudo -u git wc -l /etc/forgejo/app.ini
 
+ sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini migrate
+
 echo "tring to register worker"
-sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini \
-		forgejo-cli actions register --name forgejo-runner \
-		--secret $RUNNER_SECRET
+# This doesn't work
+#sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini forgejo-cli actions register --name forgejo-runner --scope forgejo-org --secret $RUNNER_SECRET
+# This works:
+ sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini forgejo-cli actions register --name forgejo-runner                     --secret $RUNNER_SECRET
 
 echo ""
 echo "Forgejo Server Status:"
