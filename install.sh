@@ -54,7 +54,31 @@ sudo mkdir -p /etc/forgejo
 sudo chown root:git /etc/forgejo
 sudo chmod 770 /etc/forgejo
 
-sudo wget -O /etc/forgejo/app.ini https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/custom/conf/app.example.ini
+# this can't be used for initial setup
+#sudo wget -O /etc/forgejo/app.ini https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/custom/conf/app.example.ini
+
+echo >/tmp/app.ini <<EOF
+APP_NAME = Forgejo: Beyond coding. We Forge.
+RUN_USER = git
+WORK_PATH = /var/lib/forgejo
+[server]
+[database]
+DB_TYPE = sqlite3
+[security]
+INSTALL_LOCK = true
+SECRET_KEY = 3EU0fm8LgIKyYyXjOhLE1m8ZgmIxNyFrL8aRodLHLZLJweusCvFbklzZqIXcW34p
+INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3NjM1ODM5Nzd9.j3q8a8DnfEFJlfN4F_ixlITccAvFXT7RK8tKQH9qC7I
+[camo]
+[oauth2]
+ENABLED = true
+JWT_SECRET = jmSWTxbQrX7XliCPXWmh5bDBflvmQ20JnGgrg4BN3Zg
+[log]
+MODE = console
+LEVEL = Info
+[git]
+[service]
+EOF
+sudo mv /tmp/app.ini /etc/forgejo/app.ini
 
 # Download and install systemd service
 echo "6. Installing systemd service..."
@@ -66,15 +90,16 @@ sudo systemctl daemon-reload
 sudo systemctl enable forgejo.service
 sudo systemctl start forgejo.service
 
-# XXX ^ this all works
-# XXX Below is what I'm debugging.
-
 
 export FORGEJO_WORK_DIR=/var/lib/forgejo
 export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
-echo "Secret: $RUNNER_SECRET"
+echo "XXXX Secret: $RUNNER_SECRET"
 
-sudo -u git forgejo -w /var/lib/forgejo -c /etc/forgejo/app.ini \
+echo "proof user has access to app.ini"
+sudo -u git wc -l /etc/forgejo/app.ini
+
+echo "tring to register worker"
+sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini \
 		forgejo-cli actions register --name forgejo-runner --scope forgejo-org \
 		--secret $RUNNER_SECRET
 
