@@ -66,8 +66,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable forgejo.service
 sudo systemctl start forgejo.service
 
+# XXX ^ this all works
+# XXX Below is what I'm debugging.
 
-sudo -u git forgejo command --argument
+
 export FORGEJO_WORK_DIR=/var/lib/forgejo
 export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
 echo "Secret: $RUNNER_SECRET"
