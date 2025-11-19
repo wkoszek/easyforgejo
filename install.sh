@@ -79,7 +79,7 @@ LEVEL = Info
 [service]
 EOF
 sudo mv /tmp/app.ini /etc/forgejo/app.ini
-cat /etc/forgejo/app.ini
+sudo cat /etc/forgejo/app.ini
 
 # Download and install systemd service
 echo "6. Installing systemd service..."
@@ -101,7 +101,7 @@ sudo -u git wc -l /etc/forgejo/app.ini
 
 echo "tring to register worker"
 sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini \
-		forgejo-cli actions register --name forgejo-runner --scope forgejo-org \
+		forgejo-cli actions register --name forgejo-runner \
 		--secret $RUNNER_SECRET
 
 echo ""
