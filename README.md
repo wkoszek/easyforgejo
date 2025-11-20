@@ -1,6 +1,4 @@
-# EasyForgejo
-
-**BETA** - Self-hosted Git server with CI/CD in one command
+# EasyForgejo (BETA) - Self-hosted Git server with CI/CD in one command
 
 A simple, automated installation script for [Forgejo](https://forgejo.org/) (community-driven fork of Gitea) with built-in CI/CD runner support.
 
