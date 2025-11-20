@@ -1,9 +1,22 @@
 #!/bin/bash
 set -ex
 
-IP=`ip addr show scope global | grep '^    inet ' | cut -c 10- | cut -d / -f 1`
+# Parse command-line arguments
+if [ "$#" -ne 3 ]; then
+    echo "Usage: $0 <IP> <PORT> <RUNNER_SECRET>"
+    echo "Example: $0 192.168.1.100 3000 7c31591e8b67225a116d4a4519ea8e507e08f71f"
+    exit 1
+fi
 
-export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
+export IP="$1"
+export PORT="$2"
+export RUNNER_SECRET="$3"
+
+echo "Configuration:"
+echo "  IP: $IP"
+echo "  PORT: $PORT"
+echo "  RUNNER_SECRET: $RUNNER_SECRET"
+echo ""
 
 sudo service forgejo-runner stop || true
 
@@ -37,7 +50,7 @@ forgejo-runner generate-config | sudo tee /home/runner/config.yml > /dev/null
 sudo chown runner:runner /home/runner/config.yml
 
 sudo -u runner forgejo-runner create-runner-file \
-    --instance http://${IP}:3000 \
+    --instance http://${IP}:${PORT} \
     --secret "$RUNNER_SECRET" \
     --connect
 
@@ -72,22 +85,16 @@ sudo systemctl daemon-reload
 sudo systemctl enable forgejo-runner.service
 sudo systemctl start forgejo-runner.service
 
-echo ""
-echo "========================================="
-echo "Installation Complete!"
-echo "========================================="
-echo ""
 echo "Forgejo Server Status:"
 sudo systemctl status forgejo.service --no-pager | head -10
 
-echo ""
 echo "Forgejo Runner Status:"
 sudo systemctl status forgejo-runner.service --no-pager | head -10
 
 echo ""
 echo "========================================="
-echo "Access Forgejo at: http://localhost:3000"
-echo "Check runners at: http://localhost:3000/admin/actions/runners"
+echo "Access Forgejo at: http://${IP}:${PORT}"
+echo "Check runners at: http://${IP}:${PORT}/admin/actions/runners"
 echo ""
 echo "Useful commands:"
 echo "  - View runner logs: sudo journalctl -u forgejo-runner.service -f"

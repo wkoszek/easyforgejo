@@ -1,11 +1,10 @@
 #!/bin/bash
-set -ex
 
-IP=`ip addr show scope global | grep '^    inet ' | cut -c 10- | cut -d / -f 1`
+#set -ex
 
-echo $IP
-
-#exit 1
+export IP=`ip addr show scope global | grep '^    inet ' | cut -c 10- | cut -d / -f 1`
+export PORT=3000
+export RUNNER_SECRET=`openssl rand -hex 20`
 
 sudo userdel forgejo || true
 sudo userdel git || true
@@ -73,28 +72,34 @@ sudo chmod 770 /etc/forgejo
 # this can't be used for initial setup
 #sudo wget -O /etc/forgejo/app.ini https://codeberg.org/forgejo/forgejo/raw/branch/forgejo/custom/conf/app.example.ini
 
+# Generate secrets using Forgejo CLI
+echo "5b. Generating security secrets..."
+SECRET_KEY=$(/tmp/forgejo generate secret SECRET_KEY)
+INTERNAL_TOKEN=$(/tmp/forgejo generate secret INTERNAL_TOKEN)
+JWT_SECRET=$(/tmp/forgejo generate secret JWT_SECRET)
+
 cat > /tmp/app.ini <<EOF
 APP_NAME = Forgejo: Beyond coding. We Forge.
 RUN_USER = git
 WORK_PATH = /var/lib/forgejo
 
 [server]
-ROOT_URL = http://${IP}:3000/
-HTTP_PORT = 3000
+ROOT_URL = http://${IP}:${PORT}/
+HTTP_PORT = ${PORT}
 
 [database]
 DB_TYPE = sqlite3
 
 [security]
 INSTALL_LOCK = true
-SECRET_KEY = 3EU0fm8LgIKyYyXjOhLE1m8ZgmIxNyFrL8aRodLHLZLJweusCvFbklzZqIXcW34p
-INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3NjM1ODM5Nzd9.j3q8a8DnfEFJlfN4F_ixlITccAvFXT7RK8tKQH9qC7I
+SECRET_KEY = ${SECRET_KEY}
+INTERNAL_TOKEN = ${INTERNAL_TOKEN}
 
 [camo]
 
 [oauth2]
 ENABLED = true
-JWT_SECRET = jmSWTxbQrX7XliCPXWmh5bDBflvmQ20JnGgrg4BN3Zg
+JWT_SECRET = ${JWT_SECRET}
 
 [log]
 MODE = console
@@ -118,14 +123,13 @@ sudo systemctl daemon-reload
 sudo systemctl enable forgejo.service
 sudo systemctl start forgejo.service
 
-export FORGEJO_WORK_DIR=/var/lib/forgejo
-export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
-echo "XXXX Secret: $RUNNER_SECRET"
+#export FORGEJO_WORK_DIR=/var/lib/forgejo
 
 echo "proof user has access to app.ini"
 sudo -u git wc -l /etc/forgejo/app.ini
 
- sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini migrate
+echo "# migrating DB"
+sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini migrate
 
 echo "tring to register worker"
 # This doesn't work
@@ -140,8 +144,13 @@ sudo systemctl status forgejo.service --no-pager
 echo "make admin"
 sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini admin user create --username forgejo-admin --admin --email admin@admin.com --password panacotaisthemessage --admin
 
-echo ""
-echo "========================================="
-echo "Forgejo server is now running!"
-echo "Access it at: http://localhost:3000"
-echo "========================================="
+echo "# Forgejo server should be running!"
+echo "#"
+echo "# We used IP: ${IP}"
+echo "# We used PORT: ${PORT}"
+echo "# RUNNER_SECRET: ${RUNNER_SECRET}"
+echo "#"
+echo "# Access at http://${IP}:${PORT}"
+echo "#"
+echo "# To install the worker, run:"
+echo "./install-worker.sh ${IP} ${PORT} ${RUNNER_SECRET}"
