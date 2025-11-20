@@ -1,6 +1,12 @@
 #!/bin/bash
 set -ex
 
+IP=`ip addr show scope global | grep '^    inet ' | cut -c 10- | cut -d / -f 1`
+
+echo $IP
+
+#exit 1
+
 sudo userdel forgejo || true
 sudo userdel git || true
 sudo groupdel git || true
@@ -73,7 +79,7 @@ RUN_USER = git
 WORK_PATH = /var/lib/forgejo
 
 [server]
-ROOT_URL = http://192.168.64.13:3000/
+ROOT_URL = http://${IP}:3000/
 HTTP_PORT = 3000
 
 [database]
