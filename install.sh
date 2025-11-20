@@ -71,20 +71,29 @@ cat > /tmp/app.ini <<EOF
 APP_NAME = Forgejo: Beyond coding. We Forge.
 RUN_USER = git
 WORK_PATH = /var/lib/forgejo
+
 [server]
+ROOT_URL = http://192.168.64.13:3000/
+HTTP_PORT = 3000
+
 [database]
 DB_TYPE = sqlite3
+
 [security]
 INSTALL_LOCK = true
 SECRET_KEY = 3EU0fm8LgIKyYyXjOhLE1m8ZgmIxNyFrL8aRodLHLZLJweusCvFbklzZqIXcW34p
 INTERNAL_TOKEN = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3NjM1ODM5Nzd9.j3q8a8DnfEFJlfN4F_ixlITccAvFXT7RK8tKQH9qC7I
+
 [camo]
+
 [oauth2]
 ENABLED = true
 JWT_SECRET = jmSWTxbQrX7XliCPXWmh5bDBflvmQ20JnGgrg4BN3Zg
+
 [log]
 MODE = console
 LEVEL = Info
+
 [git]
 [service]
 EOF
@@ -116,7 +125,7 @@ echo "tring to register worker"
 # This doesn't work
 #sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini forgejo-cli actions register --name forgejo-runner --scope forgejo-org --secret $RUNNER_SECRET
 # This works:
- sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini forgejo-cli actions register --name forgejo-runner                     --secret $RUNNER_SECRET
+ sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini forgejo-cli actions register --name forgejo-runner                     --secret $RUNNER_SECRET --labels default
 
 echo ""
 echo "Forgejo Server Status:"
