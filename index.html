@@ -61,10 +61,11 @@
             background: rgba(30, 30, 46, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            padding: 25px;
+            padding: 0;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             transition: box-shadow 0.2s, border-color 0.2s;
             backdrop-filter: blur(10px);
+            overflow: hidden;
         }
 
         .command-card:hover {
@@ -72,26 +73,46 @@
             border-color: rgba(139, 92, 246, 0.5);
         }
 
-        .step-section {
-            margin-bottom: 20px;
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .step-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .step-number {
-            display: inline-block;
-            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            line-height: 32px;
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #a0a0b0;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
             text-align: center;
-            font-weight: bold;
-            font-size: 1rem;
-            margin-bottom: 10px;
+        }
+
+        .tab:hover {
+            background: rgba(139, 92, 246, 0.1);
+            color: #e0e0e0;
+        }
+
+        .tab.active {
+            background: transparent;
+            color: #8b5cf6;
+            border-bottom: 2px solid #8b5cf6;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 25px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .step-section {
+            margin-bottom: 0;
         }
 
         .command-title {
@@ -188,7 +209,12 @@
                 font-size: 1rem;
             }
 
-            .command-card {
+            .tab {
+                padding: 12px 10px;
+                font-size: 0.85rem;
+            }
+
+            .tab-content {
                 padding: 20px;
             }
 
@@ -214,8 +240,12 @@
 
         <div class="commands">
             <div class="command-card">
-                <div class="step-section">
-                    <div class="step-number">1</div>
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab(event, 'server')">Server installation</button>
+                    <button class="tab" onclick="switchTab(event, 'runner')">Runner installation (optional)</button>
+                </div>
+
+                <div id="server" class="tab-content active">
                     <h2 class="command-title"><span class="emoji">⚡</span> Install Forgejo Server</h2>
                     <p class="command-desc">Sets up Forgejo with SQLite, generates secure credentials, and creates an admin account</p>
                     <div class="code-container">
@@ -224,17 +254,12 @@
                     </div>
                 </div>
 
-                <div class="step-section">
-                    <div class="step-number">2</div>
+                <div id="runner" class="tab-content">
                     <h2 class="command-title"><span class="emoji">🔧</span> Install CI Runner</h2>
-                    <p class="command-desc">Download the worker installation script, then run the command from step 1's output (requires Docker)</p>
-                    <div class="code-container" style="margin-bottom: 10px;">
-                        <button class="copy-btn" onclick="copyToClipboard(this, 'cmd2a')">Copy</button>
-                        <div class="code-block" id="cmd2a" onclick="copyToClipboard(this.previousElementSibling, 'cmd2a')">curl -sSL -O https://wkoszek.github.io/easyforgejo/install-runner.sh</div>
-                    </div>
+                    <p class="command-desc">Run the command output from server installation (requires Docker)</p>
                     <div class="code-container">
-                        <button class="copy-btn" onclick="copyToClipboard(this, 'cmd2b')">Copy</button>
-                        <div class="code-block" id="cmd2b" onclick="copyToClipboard(this.previousElementSibling, 'cmd2b')">sh ./install-runner.sh [IP] [PORT] [SECRET]</div>
+                        <button class="copy-btn" onclick="copyToClipboard(this, 'cmd2')">Copy</button>
+                        <div class="code-block" id="cmd2" onclick="copyToClipboard(this.previousElementSibling, 'cmd2')">curl -sSL https://wkoszek.github.io/easyforgejo/install-runner.sh | bash -s -- IP PORT SECRET</div>
                     </div>
                 </div>
             </div>
@@ -249,6 +274,24 @@
     </div>
 
     <script>
+        function switchTab(event, tabName) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+
+            // Show the selected tab content
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
         function copyToClipboard(button, elementId) {
             const codeBlock = document.getElementById(elementId);
             const text = codeBlock.textContent;
