@@ -10,18 +10,20 @@ export RUNNER_SECRET=`openssl rand -hex 20`
 export ADMIN_EMAIL="admin@admin.com"
 export ADMIN_PASSWORD=`openssl rand -base64 12 | tr -d '/+=' | head -c 16`
 
-sudo userdel forgejo || true
-sudo userdel git || true
-sudo groupdel git || true
-sudo rm -rf /etc/systemd/system/multi-user.target.wants/forgejo.service || true
-sudo service forgejo stop || true
+if [ "$1" = "purge" ]; then
+	sudo userdel forgejo || true
+	sudo userdel git || true
+	sudo groupdel git || true
+	sudo rm -rf /etc/systemd/system/multi-user.target.wants/forgejo.service || true
+	sudo service forgejo stop || true
 
-sudo rm -rf /usr/local/bin/forgejo
-sudo rm -rf /usr/lib/forgejo
-sudo rm -rf /var/lib/forgejo
-sudo rm -rf /etc/forgejo
-sudo rm -rf /etc/systemd/system/forgejo.service
-#sudo rm -rf /tmp/forgejo*
+	sudo rm -rf /usr/local/bin/forgejo
+	sudo rm -rf /usr/lib/forgejo
+	sudo rm -rf /var/lib/forgejo
+	sudo rm -rf /etc/forgejo
+	sudo rm -rf /etc/systemd/system/forgejo.service
+	#sudo rm -rf /tmp/forgejo*
+fi
 
 echo "========================================="
 echo "Forgejo Server & Runner Installation"
