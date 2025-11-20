@@ -209,7 +209,7 @@
                 <p class="command-desc">Sets up Forgejo with SQLite, generates secure credentials, and creates an admin account</p>
                 <div class="code-container">
                     <button class="copy-btn" onclick="copyToClipboard(this, 'cmd1')">Copy</button>
-                    <div class="code-block" id="cmd1" onclick="copyToClipboard(this.previousElementSibling, 'cmd1')">curl -sSL https://raw.githubusercontent.com/wkoszek/easyforgejo/refs/heads/main/install.sh | bash</div>
+                    <div class="code-block" id="cmd1" onclick="copyToClipboard(this.previousElementSibling, 'cmd1')">curl -sSL https://wkoszek.github.io/easyforgejo/install.sh | bash</div>
                 </div>
             </div>
 
@@ -217,9 +217,13 @@
                 <div class="step-number">2</div>
                 <h2 class="command-title"><span class="emoji">🔧</span> Install CI Runner</h2>
                 <p class="command-desc">Download the worker installation script, then run the command from step 1's output</p>
+                <div class="code-container" style="margin-bottom: 15px;">
+                    <button class="copy-btn" onclick="copyToClipboard(this, 'cmd2a')">Copy</button>
+                    <div class="code-block" id="cmd2a" onclick="copyToClipboard(this.previousElementSibling, 'cmd2a')">curl -sSL -O https://wkoszek.github.io/easyforgejo/install-worker.sh</div>
+                </div>
                 <div class="code-container">
-                    <button class="copy-btn" onclick="copyToClipboard(this, 'cmd2')">Copy</button>
-                    <div class="code-block" id="cmd2" onclick="copyToClipboard(this.previousElementSibling, 'cmd2')">curl -sSL -O https://raw.githubusercontent.com/wkoszek/easyforgejo/refs/heads/main/install-worker.sh && sh ./install-worker.sh [IP] [PORT] [SECRET]</div>
+                    <button class="copy-btn" onclick="copyToClipboard(this, 'cmd2b')">Copy</button>
+                    <div class="code-block" id="cmd2b" onclick="copyToClipboard(this.previousElementSibling, 'cmd2b')">sh ./install-worker.sh [IP] [PORT] [SECRET]</div>
                 </div>
             </div>
         </div>
