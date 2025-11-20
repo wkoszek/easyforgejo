@@ -3,6 +3,8 @@ set -ex
 
 export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
 
+sudo service forgejo-runner stop || true
+
 sudo userdel runner || true
 sudo groupdel docker || true
 
@@ -32,16 +34,16 @@ echo "6. Generating runner configuration..."
 forgejo-runner generate-config | sudo tee /home/runner/config.yml > /dev/null
 sudo chown runner:runner /home/runner/config.yml
 
-# XXX This doesn't have a way to set the label of the worker which appears (from warning in UI)
-# to render this runner as useless (can't pickup jobs)
 sudo -u runner forgejo-runner create-runner-file \
-    --instance http://localhost:3000 \
+    --instance http://192.168.64.13:3000 \
     --secret "$RUNNER_SECRET" \
     --connect
 
 ls -la
 
-# XXX fixing
+sudo cp .runner /home/runner/.runner
+
+# XXX i don't know why, but my worker doesn't show up correctly until I fix labels.
 sudo -u runner jq '. + { "labels":["default"]}' .runner > .runner.fixed
 sudo mv .runner.fixed /home/runner/.runner
 sudo chown -Rf runner:runner /home/runner/.runner
