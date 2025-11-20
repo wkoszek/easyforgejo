@@ -33,12 +33,12 @@ This will:
 
 First, download the worker script:
 ```bash
-curl -sSL -O https://wkoszek.github.io/easyforgejo/install-worker.sh
+curl -sSL -O https://wkoszek.github.io/easyforgejo/install-runner.sh
 ```
 
 Then run the command output from Step 1:
 ```bash
-sh ./install-worker.sh [IP] [PORT] [SECRET]
+sh ./install-runner.sh [IP] [PORT] [SECRET]
 ```
 
 **Note:** The CI runner requires Docker to be installed.
@@ -115,7 +115,7 @@ Check runners at: `http://[YOUR-IP]:3000/admin/actions/runners`
 ```
 .
 ├── install.sh         # Main Forgejo server installation
-├── install-worker.sh  # CI runner installation
+├── install-runner.sh  # CI runner installation
 └── index.html        # GitHub Pages landing page
 ```
 
