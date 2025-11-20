@@ -1,5 +1,6 @@
 #!/bin/bash
-set -ex
+
+#set -ex
 
 # Parse command-line arguments
 if [ "$#" -ne 3 ]; then

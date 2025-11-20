@@ -2,9 +2,13 @@
 
 #set -ex
 
-export IP=`ip addr show scope global | grep '^    inet ' | cut -c 10- | cut -d / -f 1`
+export IP=`ip addr show scope global | grep 'inet ' | grep -v '127\.' | head -1 | awk '{print $2}' | cut -d/ -f1`
 export PORT=3000
 export RUNNER_SECRET=`openssl rand -hex 20`
+
+# Admin credentials
+export ADMIN_EMAIL="admin@admin.com"
+export ADMIN_PASSWORD=`openssl rand -base64 12 | tr -d '/+=' | head -c 16`
 
 sudo userdel forgejo || true
 sudo userdel git || true
@@ -142,15 +146,29 @@ echo "Forgejo Server Status:"
 sudo systemctl status forgejo.service --no-pager
 
 echo "make admin"
-sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini admin user create --username forgejo-admin --admin --email admin@admin.com --password panacotaisthemessage --admin
+sudo -u git forgejo -w /var/lib/forgejo --config /etc/forgejo/app.ini admin user create --username forgejo-admin --admin --email "${ADMIN_EMAIL}" --password "${ADMIN_PASSWORD}" --admin
 
-echo "# Forgejo server should be running!"
-echo "#"
-echo "# We used IP: ${IP}"
-echo "# We used PORT: ${PORT}"
-echo "# RUNNER_SECRET: ${RUNNER_SECRET}"
-echo "#"
-echo "# Access at http://${IP}:${PORT}"
-echo "#"
-echo "# To install the worker, run:"
-echo "./install-worker.sh ${IP} ${PORT} ${RUNNER_SECRET}"
+echo ""
+echo "========================================="
+echo "    FORGEJO INSTALLATION COMPLETE!"
+echo "========================================="
+echo ""
+echo "Access your Forgejo instance at:"
+echo ""
+echo "  http://${IP}:${PORT}"
+echo "  Username: forgejo-admin"
+echo "  Email:    ${ADMIN_EMAIL}"
+echo "  Password: ${ADMIN_PASSWORD}"
+echo "========================================="
+echo ""
+echo "IMPORTANT NEXT STEPS:"
+echo "  1. LOGIN using the admin credentials above"
+echo "  2. CREATE your own non-admin account for daily use"
+echo "  3. Change the admin password in settings"
+echo ""
+echo "========================================="
+echo "    You should install the CI runner now:"
+echo "========================================="
+echo ""
+echo "sh ./install-worker.sh ${IP} ${PORT} ${RUNNER_SECRET}"
+echo ""
