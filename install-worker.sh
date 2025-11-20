@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+IP=`ip addr show scope global | grep '^    inet ' | cut -c 10- | cut -d / -f 1`
+
 export RUNNER_SECRET=7c31591e8b67225a116d4a4519ea8e507e08f71f
 
 sudo service forgejo-runner stop || true
@@ -35,7 +37,7 @@ forgejo-runner generate-config | sudo tee /home/runner/config.yml > /dev/null
 sudo chown runner:runner /home/runner/config.yml
 
 sudo -u runner forgejo-runner create-runner-file \
-    --instance http://192.168.64.13:3000 \
+    --instance http://${IP}:3000 \
     --secret "$RUNNER_SECRET" \
     --connect
 
