@@ -10,12 +10,12 @@ export RUNNER_SECRET=`openssl rand -hex 20`
 export ADMIN_EMAIL="admin@admin.com"
 export ADMIN_PASSWORD=`openssl rand -base64 12 | tr -d '/+=' | head -c 16`
 
-if [ "$1" = "purge" ]; then
+if [[ "$1" == "purge" || "$1" == "remove" ]]; then
+	sudo rm -rf /etc/systemd/system/multi-user.target.wants/forgejo.service || true
+	sudo service forgejo stop || true
 	sudo userdel forgejo || true
 	sudo userdel git || true
 	sudo groupdel git || true
-	sudo rm -rf /etc/systemd/system/multi-user.target.wants/forgejo.service || true
-	sudo service forgejo stop || true
 
 	sudo rm -rf /usr/local/bin/forgejo
 	sudo rm -rf /usr/lib/forgejo
@@ -23,6 +23,11 @@ if [ "$1" = "purge" ]; then
 	sudo rm -rf /etc/forgejo
 	sudo rm -rf /etc/systemd/system/forgejo.service
 	#sudo rm -rf /tmp/forgejo*
+fi
+
+if [ "$1" = "remove" ]; then
+	echo "foregjo removed, thanks for trying"
+	exit 0
 fi
 
 echo "========================================="

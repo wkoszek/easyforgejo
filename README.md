@@ -128,7 +128,9 @@ TODO: it's all shown at STDOUT during install
 
 ## Uninstalling
 
-TODO
+```
+curl -sSL https://rhildred.github.io/easyforgejo/install.sh | bash remove
+```
 
 ## Reinstalling 
 
