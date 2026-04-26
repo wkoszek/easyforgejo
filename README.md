@@ -128,14 +128,16 @@ TODO: it's all shown at STDOUT during install
 
 ## Uninstalling
 
-TODO
+```
+curl -sSL https://rhildred.github.io/easyforgejo/install.sh | bash -s -- remove
+```
 
 ## Reinstalling 
 
 Purge mode will allow you to reinstall the server (useful for testing script modifications):
 
 ```bash
-sudo bash install.sh purge
+curl -sSL https://wkoszek.github.io/easyforgejo/install.sh | bash -s -- purge
 ```
 
 TODO: need to support this for worker too
